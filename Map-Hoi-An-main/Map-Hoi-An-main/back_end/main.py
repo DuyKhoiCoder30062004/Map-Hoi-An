@@ -1,3 +1,6 @@
+# Map-Hoi-An Backend API
+# FastAPI server for restaurant voice guidance system
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
