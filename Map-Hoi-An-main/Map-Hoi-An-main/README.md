@@ -21,3 +21,6 @@
 3. Make your changes and commit: `git commit -m 'Add feature'`
 4. Push to the branch: `git push origin feature-name`
 5. Open a pull request
+
+## License
+This project is licensed under the MIT License - see the LICENSE file for details.
