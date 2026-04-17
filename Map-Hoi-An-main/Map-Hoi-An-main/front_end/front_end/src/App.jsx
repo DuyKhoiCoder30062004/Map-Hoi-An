@@ -1,4 +1,7 @@
-﻿import React, { useState, useEffect, useRef } from "react";
+﻿// Map-Hoi-An Frontend Application
+// React app for interactive restaurant map with voice guidance
+
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from "react-leaflet";
 import L from "leaflet";
