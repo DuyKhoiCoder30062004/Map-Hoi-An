@@ -34,3 +34,10 @@ The backend provides RESTful APIs for:
 - Statistics: `/api/stats`
 
 See the backend code in `back_end/main.py` for detailed endpoint documentation.
+
+## Acknowledgments
+- Google Gemini API for AI text generation
+- ElevenLabs for high-quality text-to-speech
+- FastAPI and React communities for excellent frameworks
+- Leaflet for mapping functionality
+- PostGIS for geospatial database support
