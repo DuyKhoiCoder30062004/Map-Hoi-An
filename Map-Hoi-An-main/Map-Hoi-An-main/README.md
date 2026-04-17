@@ -9,11 +9,12 @@
 
 ## Installation
 1. Clone the repository
-2. Install backend dependencies: `pip install -r back_end/requirements.txt`
-3. Install frontend dependencies: `npm install` in front_end/front_end/
-4. Set up environment variables
-5. Run backend: `python back_end/main.py`
-6. Run frontend: `npm run dev` in front_end/front_end/
+2. Copy `.env.example` to `.env` and configure your environment variables
+3. Install backend dependencies: `pip install -r back_end/requirements.txt`
+4. Install frontend dependencies: `npm install` in front_end/front_end/
+5. Set up PostgreSQL database with PostGIS extension
+6. Run backend: `python back_end/main.py`
+7. Run frontend: `npm run dev` in front_end/front_end/
 
 ## Contributing
 1. Fork the repository
