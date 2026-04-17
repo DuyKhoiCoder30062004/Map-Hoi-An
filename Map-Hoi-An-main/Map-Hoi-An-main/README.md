@@ -24,3 +24,12 @@
 
 ## License
 This project is licensed under the MIT License - see the LICENSE file for details.
+
+## API Documentation
+The backend provides RESTful APIs for:
+- Authentication: `/api/register`, `/api/login`
+- Restaurants: `/api/nearby`, `/api/restaurants`
+- AI Services: `/api/translate`, `/api/tts`
+- Statistics: `/api/stats`
+
+See the backend code in `back_end/main.py` for detailed endpoint documentation.
