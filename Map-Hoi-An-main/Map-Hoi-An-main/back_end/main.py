@@ -19,6 +19,10 @@ load_dotenv()
 
 app = FastAPI()
 
+# TODO: Add rate limiting for API endpoints
+# TODO: Implement caching for restaurant data
+# TODO: Add input validation for all endpoints
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"], 
