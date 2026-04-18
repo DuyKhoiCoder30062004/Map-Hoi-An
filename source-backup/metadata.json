@@ -1,5 +1,0 @@
-{
-  "name": "Vĩnh Khánh Food Map",
-  "description": "A comprehensive map of food stalls and restaurants on Vĩnh Khánh Street with AI-powered translation and audio guides.",
-  "requestFramePermissions": ["geolocation"]
-}
