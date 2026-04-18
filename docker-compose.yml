@@ -1,0 +1,43 @@
+
+
+services:
+  # 1. Dịch vụ Database (Giữ nguyên cấu trúc của bạn)
+  db:
+    image: postgis/postgis:15-3.3
+    container_name: vinhkhanh_db_container
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: ${DB_PASSWORD} # Lấy từ file .env ở gốc
+      POSTGRES_DB: vinhkhanh_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+  # 2. Dịch vụ Backend
+  backend:
+    build: ./back_end
+    container_name: vinhkhanh_backend_container
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      # QUAN TRỌNG: Đổi localhost thành db để Python gọi đúng container Database
+      DB_HOST: db 
+    depends_on:
+      - db
+
+  # 3. Dịch vụ Frontend
+  frontend:
+    build: ./front_end
+    container_name: vinhkhanh_frontend_container
+    ports:
+      - "5173:5173"
+    env_file:
+      - .env
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:

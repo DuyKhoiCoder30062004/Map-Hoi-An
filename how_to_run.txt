@@ -1,0 +1,75 @@
+0. docker
+    turn on docker app or file
+1. in frontend
+    npm run dev 
+2. in main.py
+    uvicorn main:app --reload
+
+
+run a to z
+
+
+🚀 HƯỚNG DẪN CHẠY ĐỒ ÁN VĨNH KHÁNH FOOD MAP
+
+1. Chuẩn bị môi trường:
+
+Máy phải cài sẵn Docker Desktop (bật nó lên cho icon chạy xanh), Node.js và Python (Lưu ý: Lúc cài Python nhớ tích ô "Add Python to PATH").
+
+Lấy 1 cái Gemini API Key bên trang Google AI Studio. Mở file back_end/main.py dán cái key đó vào chỗ biến GEMINI_API_KEY.
+
+2. Khởi động Database (Bằng Docker):
+
+Mở Terminal tại thư mục gốc của đồ án, gõ lệnh:
+docker-compose up -d
+
+Mở DBeaver
+    A. Tạo kết nối:
+
+    Mở phần mềm DBeaver. Ở góc trên cùng bên trái, bấm vào biểu tượng Cái phích cắm có dấu cộng (New Database Connection).
+
+    Chọn biểu tượng con voi PostgreSQL rồi bấm Next.
+
+    Cửa sổ Connection Settings hiện ra, hãy điền chính xác các thông số sau:
+
+    Host: localhost
+
+    Port: 5432
+
+    Database: vinhkhanh_db
+
+    Username: (Mở file docker-compose.yml xem dòng POSTGRES_USER bạn ấy đang ghi là gì thì copy vào đây. Thường mặc định là postgres hoặc admin).
+
+    Password: (Copy dòng POSTGRES_PASSWORD trong file docker-compose.yml dán vào).
+
+    Bấm nút Test Connection ở góc dưới bên trái. Nếu nó hiện hộp thoại báo "Connected" (Đã kết nối) thì bấm Finish.
+
+    B. Đổ dữ liệu (Import file .sql):
+
+    Ở cột bên trái (Database Navigator), bấm mũi tên xổ xuống theo đường dẫn: vinhkhanh_db -> Schemas.
+
+    Bấm chuột phải vào chữ public -> Chọn SQL Editor -> Chọn Open SQL script.
+
+    Một cửa sổ chọn file hiện ra, hãy tìm và chọn cái file vinhkhanh_data.sql nằm trong thư mục đồ án.
+
+    File code SQL sẽ được mở ra trên màn hình. Bạn chỉ cần bấm tổ hợp phím Alt + X (hoặc nút Execute Script màu cam góc trên bên trái cửa sổ code).
+
+    Đợi nó chạy xong (hiện chữ Finish). Bạn có thể chuột phải vào bảng restaurants -> View Data để kiểm tra xem danh sách quán ăn đã hiện ra chưa là thành công!
+    3. Khởi động Backend API (Quan trọng):
+
+Mở một Terminal mới, di chuyển vào thư mục back_end.
+
+Gõ lệnh cài thư viện Python: pip install -r requirements.txt
+
+Gõ lệnh chạy Server: uvicorn main:app --reload
+
+(Khi thấy dòng chữ "Application startup complete" và cổng 8000 mở là thành công)
+
+4. Khởi động Giao diện Web (Frontend):
+
+Mở một Terminal khác nữa, di chuyển vào thư mục front_end/frontend.
+
+Gõ lệnh cài thư viện: npm install
+
+Gõ lệnh chạy web: npm run dev
+
+Mở trình duyệt truy cập: http://localhost:5173 là xong!

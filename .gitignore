@@ -1,0 +1,17 @@
+# Biến môi trường
+.env
+.env.local
+
+# Backend (Python)
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Frontend (Node/Vite)
+node_modules/
+dist/
+
+# Khác
+.vscode/
+.DS_Store
