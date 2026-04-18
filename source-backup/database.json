@@ -1,0 +1,35 @@
+{
+  "users": [
+    {
+      "id": 1776320999947,
+      "username": "admin",
+      "password": "$2b$10$7DwWIcybKC9PP1uBNPRQPenxx3Oa9WR6mgBe80zExF4YxeA1c66IG",
+      "role": "admin"
+    }
+  ],
+  "restaurants": [],
+  "requests": [],
+  "plans": [
+    {
+      "id": "basic",
+      "name": "Gói Cơ Bản",
+      "max_pois": 1,
+      "max_langs": 2,
+      "price": "Miễn phí"
+    },
+    {
+      "id": "pro",
+      "name": "Gói Chuyên Nghiệp",
+      "max_pois": 5,
+      "max_langs": 5,
+      "price": "500.000đ/tháng"
+    },
+    {
+      "id": "enterprise",
+      "name": "Gói Doanh Nghiệp",
+      "max_pois": 20,
+      "max_langs": 5,
+      "price": "2.000.000đ/tháng"
+    }
+  ]
+}
