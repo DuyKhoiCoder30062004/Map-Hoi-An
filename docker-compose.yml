@@ -1,0 +1,55 @@
+services:
+  # 1. Dịch vụ Database (Giữ nguyên)
+  db:
+    image: postgis/postgis:15-3.3
+    container_name: vinhkhanh_db_container
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: vinhkhanh_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  # 2. Dịch vụ Backend
+  backend:
+    build: ./back_end
+    container_name: vinhkhanh_backend_container
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      DB_HOST: db 
+    depends_on:
+      - db
+    # ✨ ĐÃ THÊM: Đồng bộ code từ thư mục ./back_end vào trong container
+    volumes:
+      - ./back_end:/app 
+    # ✨ ĐÃ THÊM: Ghi đè lệnh chạy để bật tính năng --reload của FastAPI
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+  # 3. Dịch vụ Frontend
+  frontend:
+    build: ./front_end
+    container_name: vinhkhanh_frontend_container
+    ports:
+      - "5173:5173"
+    env_file:
+      - .env
+    depends_on:
+      - backend
+    environment:
+      # ✨ ĐÃ THÊM: Giúp Vite/React nhận diện file thay đổi qua Docker (Cực kỳ quan trọng trên Windows)
+      - CHOKIDAR_USEPOLLING=true 
+      - WATCHPACK_POLLING=true
+      
+    # ✨ ĐÃ THÊM: Đồng bộ code Frontend
+    volumes:
+      - ./front_end:/app
+      - /app/node_modules # Mẹo: Giữ nguyên thư viện bên trong Docker, không cho máy ảo ghi đè ra ngoài
+
+volumes:
+  postgres_data:
