@@ -18,6 +18,30 @@ function MapController({ center }) {
   return null;
 }
 
+// Component tự động mở Popup từ QR Code
+function QRController({ restaurants, markerRefs }) {
+  const map = useMap();
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const qrRestId = urlParams.get('restId');
+    if (restaurants?.length > 0 && qrRestId) {
+      const rest = restaurants.find(r => r.id === parseInt(qrRestId));
+      if (rest) {
+        // Di chuyển bản đồ đến vị trí quán
+        map.flyTo([parseFloat(rest.lat), parseFloat(rest.lng)], 18, { animate: true, duration: 1.5 });
+        
+        // Đợi một chút cho map tải xong rồi mở popup
+        setTimeout(() => {
+          if (markerRefs.current[rest.id]) {
+            markerRefs.current[rest.id].openPopup();
+          }
+        }, 1000);
+      }
+    }
+  }, [restaurants, map, markerRefs]);
+  return null;
+}
+
 export default function MapViewer({ 
   user, setAuthMode, handleLogout, 
   restaurants, userLocation, mapCenter 
@@ -29,6 +53,7 @@ export default function MapViewer({
   const [history, setHistory] = useState([]);
   
   const audioSourceRef = useRef(null);
+  const markerRefs = useRef({});
   const [autoOpenedRestId, setAutoOpenedId] = useState(null);
 
   // --- LẤY LỊCH SỬ ---
@@ -104,6 +129,11 @@ export default function MapViewer({
     if (closestRest && autoOpenedRestId !== closestRest.id) {
       setSelectedRestaurant(closestRest); 
       setAutoOpenedId(closestRest.id);    
+      
+      // Mở popup tự động khi đến gần
+      if (markerRefs.current[closestRest.id]) {
+        markerRefs.current[closestRest.id].openPopup();
+      }
     } else if (!closestRest) {
       setAutoOpenedId(null);
     }
@@ -192,6 +222,7 @@ export default function MapViewer({
           attribution='&copy; OpenStreetMap' 
         />
         <MapController center={mapCenter} />
+        <QRController restaurants={restaurants} markerRefs={markerRefs} />
         
         {userLocation && (
           <Marker position={userLocation} icon={blueIcon}>
@@ -206,7 +237,12 @@ export default function MapViewer({
           const isPlaying = audioUrl === "playing";
 
           return (
-            <Marker key={rest.id} position={[parseFloat(rest.lat), parseFloat(rest.lng)]} icon={redIcon}>
+            <Marker 
+              key={rest.id} 
+              position={[parseFloat(rest.lat), parseFloat(rest.lng)]} 
+              icon={redIcon}
+              ref={(m) => { if (m) markerRefs.current[rest.id] = m; }}
+            >
               <Popup maxWidth={300} className="modern-popup">
                 <div className="p-1 min-w-[200px]">
                   <div className="flex items-center gap-2 mb-2">
