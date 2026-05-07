@@ -237,11 +237,11 @@ def get_online_count():
         cursor = conn.cursor()
         
         # Đếm User online
-        cursor.execute("SELECT COUNT(*) FROM users WHERE last_active > CURRENT_TIMESTAMP - INTERVAL '15 seconds'")
+        cursor.execute("SELECT COUNT(*) FROM users WHERE last_active > CURRENT_TIMESTAMP - INTERVAL '60 seconds'")
         user_count = cursor.fetchone()[0]
         
         # Đếm Khách vãng lai online
-        cursor.execute("SELECT COUNT(*) FROM guest_sessions WHERE last_active > CURRENT_TIMESTAMP - INTERVAL '15 seconds'")
+        cursor.execute("SELECT COUNT(*) FROM guest_sessions WHERE last_active > CURRENT_TIMESTAMP - INTERVAL '60 seconds'")
         guest_count = cursor.fetchone()[0]
         
         cursor.close()
@@ -311,7 +311,7 @@ def user_heartbeat(req: dict):
         
         # Nếu là User có tài khoản
         if user_id:
-            cursor.execute("UPDATE users SET last_active = CURRENT_TIMESTAMP WHERE id = %s AND role NOT IN ('admin', 'owner')", (user_id,))
+            cursor.execute("UPDATE users SET last_active = CURRENT_TIMESTAMP WHERE id = %s", (user_id,))
             
         # Nếu là Khách vãng lai (có guest_id)
         if guest_id:

@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { API_URL } from "./config/constants";
 
@@ -86,7 +86,7 @@ export default function App() {
 
   /// Đếm người online và gửi Heartbeat
   useEffect(() => {
-    const interval = setInterval(async () => {
+    const sendHeartbeat = async () => {
       try {
         let guestId = localStorage.getItem("guest_id") || "guest_" + Math.random().toString(36).substring(2, 11);
         localStorage.setItem("guest_id", guestId);
@@ -97,14 +97,16 @@ export default function App() {
           setOnlineCount(res.data.online_count);
         }
         
-        // 2. Gọi POST kèm Header (Nằm ở tham số thứ 3)
+        // 2. Gọi POST kèm Header
         await axios.post(
           `${API_URL}/api/users/heartbeat`, 
           { user_id: user?.id || null, guest_id: user?.id ? null : guestId }
-        
         );
       } catch (e) {}
-    }, 5000);
+    };
+
+    sendHeartbeat(); // Gọi ngay lập tức khi mount
+    const interval = setInterval(sendHeartbeat, 5000);
     
     return () => clearInterval(interval);
   }, [authMode, user]);
