@@ -21,29 +21,41 @@ export default function App() {
 
   // 2. GIỮ LẠI CÁC HÀM FETCH DATA [cite: 56-60]
   const fetchRestaurants = async () => { 
-  try {
-    const res = await axios.get(`${API_URL}/api/nearby`); 
-    // Chỉ cập nhật nếu dữ liệu trả về đúng là một mảng
-    if (Array.isArray(res.data)) {
-      setRestaurants(res.data); 
-    } else {
-      console.warn("API không trả về mảng:", res.data);
-      setRestaurants([]); // Ép về mảng rỗng để không bị lỗi
+    try {
+      const res = await axios.get(`${API_URL}/api/nearby`); 
+      // Chỉ cập nhật nếu dữ liệu trả về đúng là một mảng
+      if (Array.isArray(res.data)) {
+        setRestaurants(res.data); 
+      } else {
+        console.warn("API không trả về mảng:", res.data);
+        setRestaurants([]); // Ép về mảng rỗng để không bị lỗi
+      }
+    } catch (error) {
+      console.error("Lỗi khi tải quán ăn:", error);
+      setRestaurants([]); // Nếu API sập, cũng ép về mảng rỗng
     }
-  } catch (error) {
-    console.error("Lỗi khi tải quán ăn:", error);
-    setRestaurants([]); // Nếu API sập, cũng ép về mảng rỗng
-  }
-};
-  const fetchStats = async () => { try { const res = await axios.get(`${API_URL}/api/stats`); setStats(res.data); } catch(e){} };
+  };
+
+  const fetchStats = async () => { 
+    try { 
+      const res = await axios.get(`${API_URL}/api/stats`);
+      setStats(res.data); 
+    } catch(e) {} 
+  };
+
   const fetchPackages = async () => {
     try { 
       const res = await axios.get(`${API_URL}/api/admin/packages`);
-      setPackages(res.data); }
-    catch(e){} 
+      setPackages(res.data); 
+    } catch(e) {} 
   };
 
-  const fetchUsers = async () => { try { const res = await axios.get(`${API_URL}/api/users`); setUsersList(res.data); } catch(e){} };
+  const fetchUsers = async () => {
+    try { 
+      const res = await axios.get(`${API_URL}/api/users`); 
+      setUsersList(res.data); 
+    } catch(e) {} 
+  };
 
   // 3. GIỮ LẠI USEEFFECT CHẠY GPS & LẤY DATA [cite: 36-45]
   useEffect(() => {
@@ -72,23 +84,36 @@ export default function App() {
     return () => { if (watchId) navigator.geolocation.clearWatch(watchId); };
   }, [authMode]);
 
-  // Đếm người online và gửi Heartbeat
+  /// Đếm người online và gửi Heartbeat
   useEffect(() => {
     const interval = setInterval(async () => {
       try {
         let guestId = localStorage.getItem("guest_id") || "guest_" + Math.random().toString(36).substring(2, 11);
         localStorage.setItem("guest_id", guestId);
+        
+        // 1. Gọi GET kèm Header
         if (authMode === "admin" || authMode === "app") {
           const res = await axios.get(`${API_URL}/api/admin/online-count`);
           setOnlineCount(res.data.online_count);
         }
-        await axios.post(`${API_URL}/api/users/heartbeat`, { user_id: user?.id || null, guest_id: user?.id ? null : guestId });
+        
+        // 2. Gọi POST kèm Header (Nằm ở tham số thứ 3)
+        await axios.post(
+          `${API_URL}/api/users/heartbeat`, 
+          { user_id: user?.id || null, guest_id: user?.id ? null : guestId }
+        
+        );
       } catch (e) {}
     }, 5000);
+    
     return () => clearInterval(interval);
   }, [authMode, user]);
 
-  const handleLogout = () => { localStorage.removeItem("vinhkhanh_user"); setUser(null); setAuthMode("login"); };
+  const handleLogout = () => { 
+    localStorage.removeItem("vinhkhanh_user"); 
+    setUser(null); 
+    setAuthMode("login"); 
+  };
 
   // 4. RENDER GIAO DIỆN CHÍNH
   if (authMode === "login" || authMode === "register") {

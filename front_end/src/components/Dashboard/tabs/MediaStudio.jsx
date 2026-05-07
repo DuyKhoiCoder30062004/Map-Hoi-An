@@ -40,10 +40,10 @@ export default function MediaStudio({ user, restaurants, fetchRestaurants }) {
     setIsGeneratingAll(true);
     let workingRest = { ...newRest };
     try {
-      const transRes = await axios.post(`${API_URL}/api/translate`, {
-        text: workingRest.description,
-        target_languages: selectedLangs,
-      });
+      const transRes = await axios.post(`${API_URL}/api/translate`, 
+        { text: workingRest.description,
+        target_languages: selectedLangs, },
+      );
       for (const lang of selectedLangs) {
         if (transRes.data[lang]) workingRest[`description_${lang}`] = transRes.data[lang];
       }
