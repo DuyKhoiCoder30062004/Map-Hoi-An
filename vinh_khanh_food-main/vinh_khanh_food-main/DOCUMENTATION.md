@@ -225,124 +225,14 @@ graph LR
 
 ## 5.5 Sequence Diagram
 
-```mermaid
-sequenceDiagram
-    participant Browser
-    participant Frontend
-    participant Backend
-    participant Database
-    participant Gemini
-    participant ElevenLabs
+Xem chi tiết sơ đồ Sequence theo file báo cáo tại [diagrams/SEQUENCE.md](diagrams/SEQUENCE.md).
 
-    Browser ->> Frontend: Mở app
-    Frontend ->> Backend: GET /api/nearby
-    Backend ->> Database: SELECT restaurants
-    Database -->> Backend: Trả danh sách nhà hàng
-    Backend -->> Frontend: Trả JSON restaurants
-    Frontend -->> Browser: Hiển thị bản đồ
-
-    Browser ->> Frontend: Click "Nghe audio"
-    Frontend ->> Backend: POST /api/user/history
-    Backend ->> Database: INSERT listen_history
-    Database -->> Backend: OK
-    Backend -->> Frontend: Xác nhận
-    Frontend -->> Browser: Phát audio base64
-
-    Browser ->> Frontend: Click login
-    Frontend ->> Backend: POST /api/login
-    Backend ->> Database: SELECT users
-    Database -->> Backend: user data
-    Backend -->> Frontend: Trả token + user info
-    Frontend -->> Browser: Lưu localStorage
-```
-
-### Sequence Diagram cho Admin
-
-```mermaid
-sequenceDiagram
-    participant Admin
-    participant Frontend
-    participant Backend
-    participant Database
-
-    Admin ->> Frontend: Mở Dashboard Admin
-    Frontend ->> Backend: GET /api/users
-    Backend ->> Database: SELECT users
-    Database -->> Backend: Danh sách users
-    Backend -->> Frontend: Trả JSON users
-    Frontend -->> Admin: Hiển thị danh sách users
-
-    Admin ->> Frontend: Tạo user mới
-    Frontend ->> Backend: POST /api/users
-    Backend ->> Database: INSERT users
-    Database -->> Backend: OK
-    Backend -->> Frontend: Thành công
-    Frontend -->> Admin: Thông báo tạo user thành công
-```
-
-### Sequence Diagram cho User
-
-```mermaid
-sequenceDiagram
-    participant User
-    participant Frontend
-    participant Backend
-    participant Database
-
-    User ->> Frontend: Đăng nhập
-    Frontend ->> Backend: POST /api/login
-    Backend ->> Database: SELECT users
-    Database -->> Backend: User data
-    Backend -->> Frontend: Token + info
-    Frontend -->> User: Chuyển đến MapViewer
-
-    User ->> Frontend: Chọn quán và nghe audio
-    Frontend ->> Backend: POST /api/user/history
-    Backend ->> Database: INSERT listen_history
-    Database -->> Backend: OK
-    Backend -->> Frontend: OK
-    Frontend -->> User: Phát audio
-```
-
-### Sequence Diagram cho Chủ quán (Owner)
-
-```mermaid
-sequenceDiagram
-    participant Owner
-    participant Frontend
-    participant Backend
-    participant Database
-    participant Gemini
-    participant ElevenLabs
-
-    Owner ->> Frontend: Mở Dashboard Owner
-    Frontend ->> Backend: GET /api/owner/my_restaurants/{owner_id}
-    Backend ->> Database: SELECT restaurants WHERE owner_id = ?
-    Database -->> Backend: Danh sách quán
-    Backend -->> Frontend: JSON restaurants
-    Frontend -->> Owner: Hiển thị quán của owner
-
-    Owner ->> Frontend: Tạo quán mới
-    Frontend ->> Backend: POST /api/restaurants
-    Backend ->> Database: INSERT restaurants
-    Database -->> Backend: OK
-    Backend -->> Frontend: Thành công
-    Frontend -->> Owner: Thông báo tạo quán thành công
-
-    Owner ->> Frontend: Dịch thuật mô tả
-    Frontend ->> Backend: POST /api/translate
-    Backend ->> Gemini: Gửi prompt dịch
-    Gemini -->> Backend: Văn bản dịch
-    Backend -->> Frontend: JSON translations
-    Frontend -->> Owner: Hiển thị bản dịch
-
-    Owner ->> Frontend: Tạo audio
-    Frontend ->> Backend: POST /api/tts
-    Backend ->> ElevenLabs: Gửi text
-    ElevenLabs -->> Backend: Audio base64
-    Backend -->> Frontend: Audio data
-    Frontend -->> Owner: Phát audio
-```
+Đã cập nhật các luồng thực tế của dự án theo code frontend/backend hiện tại, bao gồm:
+- App khởi động và lấy danh sách nhà hàng gần nhất
+- User đăng nhập, chuyển sang MapViewer và lưu localStorage
+- User nghe audio và ghi lịch sử nghe
+- Owner quản lý quán, dịch thuật và tạo audio TTS
+- Admin quản lý users/owners và subscription packages
 
 ## 5.6 Endpoints
 
