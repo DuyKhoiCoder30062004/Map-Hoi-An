@@ -2,35 +2,47 @@
 
 ```mermaid
 graph LR
-    Admin((Admin))
-    Owner((Owner))
-    User((Registered User))
     Guest((Guest))
+    User((Registered User))
+    Owner((Owner))
+    Admin((Admin))
 
-    subgraph "Use Cases"
-        Login["Đăng nhập / Đăng ký"]
-        Browse["Xem bản đồ và nhà hàng"]
-        Audio["Nghe thuyết minh audio"]
-        History["Lưu lịch sử nghe"]
-        ManagePOI["Quản lý quán ăn"]
-        Subscribe["Đăng ký gói package"]
-        Translate["Dịch thuật / TTS"]
-        ManageUsers["Quản lý users/owners"]
-        ManagePackage["Tạo / Cập nhật package"]
-        Stats["Xem thống kê"]
+    subgraph "Core Use Cases"
+        Auth["Đăng nhập / Đăng ký"]
+        BrowseMap["Xem bản đồ / QR Location"]
+        PlayAudio["Nghe thuyết minh audio"]
+        AutoNearby["Tự động mở POI khi gần"]
+        SaveHistory["Lưu lịch sử nghe"]
+        ViewHistory["Xem lịch sử nghe"]
     end
 
-    Guest --> Browse
-    Guest --> Audio
-    User --> Login
-    User --> Browse
-    User --> Audio
-    User --> History
-    Owner --> Login
-    Owner --> ManagePOI
-    Owner --> Subscribe
-    Owner --> Translate
+    subgraph "Owner / Admin Management"
+        ManagePOI["Quản lý quán ăn / POI"]
+        ManagePackages["Quản lý gói / package"]
+        ManageUsers["Quản lý user / chủ quán"]
+        TranslateContent["Dịch văn bản / tạo nội dung"]
+        GenerateAudio["Tạo audio TTS đa ngôn ngữ"]
+        ViewStats["Xem thống kê hệ thống"]
+    end
+
+    Guest --> BrowseMap
+    Guest --> PlayAudio
+    User --> Auth
+    User --> BrowseMap
+    User --> PlayAudio
+    User --> SaveHistory
+    User --> ViewHistory
+    Admin --> Auth
     Admin --> ManageUsers
-    Admin --> ManagePackage
-    Admin --> Stats
+    Admin --> ManagePackages
+    Admin --> ViewStats
+    Owner --> Auth
+    Owner --> ManagePOI
+    Owner --> TranslateContent
+    Owner --> GenerateAudio
+    Owner --> ManagePackages
+    Owner --> BrowseMap
+
+    BrowseMap --> AutoNearby
+    PlayAudio --> SaveHistory
 ```

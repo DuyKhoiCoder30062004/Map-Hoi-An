@@ -10,14 +10,13 @@ erDiagram
         jsonb settings
         timestamp last_active
     }
+
     restaurants {
         int id PK
         string name
-        text description
         string specialty_dish
         string image_url
-        geometry location
-        int owner_id FK
+        text description
         text description_en
         text description_ko
         text description_zh
@@ -47,7 +46,10 @@ erDiagram
         text audio_pt
         text audio_hi
         text audio_id
+        geometry location
+        int owner_id FK
     }
+
     subscription_packages {
         int id PK
         string name
@@ -58,6 +60,7 @@ erDiagram
         int poi_limit
         jsonb allowed_langs
     }
+
     owner_subscriptions {
         int id PK
         int owner_id FK
@@ -66,6 +69,7 @@ erDiagram
         timestamp end_date
         string status
     }
+
     listen_history {
         int id PK
         int user_id FK
@@ -73,34 +77,17 @@ erDiagram
         string lang
         timestamp listened_at
     }
+
     guest_sessions {
         string guest_id PK
         timestamp last_active
     }
-    partners {
-        int id PK
-        int user_id FK
-        int poi_id FK
-        string name
-        text description
-        string status
-        string intro_media_url
-    }
-    interaction_logs {
-        int id PK
-        int user_id FK
-        string action
-        string target_type
-        int target_id
-        timestamp timestamp
-    }
 
-    users ||--o{ owner_subscriptions : "has"
-    subscription_packages ||--o{ owner_subscriptions : "includes"
     users ||--o{ restaurants : "owns"
-    users ||--o{ listen_history : "logs"
-    restaurants ||--o{ listen_history : "logs"
-    users ||--o{ interaction_logs : "records"
-    users ||--o{ partners : "associates"
-    restaurants ||--o{ partners : "associates"
+    users ||--o{ owner_subscriptions : "holds"
+    subscription_packages ||--o{ owner_subscriptions : "defines"
+    users ||--o{ listen_history : "records"
+    restaurants ||--o{ listen_history : "records"
 ```
+
+> Lưu ý: `partners` và `interaction_logs` được tạo bởi `init_pois.sql` nhưng không phải là phần chính của luồng ứng dụng hiện tại.
