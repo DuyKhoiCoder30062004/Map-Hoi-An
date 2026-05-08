@@ -116,4 +116,113 @@ classDiagram
 ## 3. Mối quan hệ giữa các Lớp (Class Relationships)
 *   **Ownership (1:N):** Một Chủ quán (`User`) quản lý nhiều `Restaurant`.
 *   **Dependency:** Lớp `Restaurant` phụ thuộc vào `AIService` để hoàn thiện các dữ liệu thuyết minh đa ngôn ngữ.
+
+
+```mermaid
+classDiagram
+    class User {
+        +int id
+        +string username
+        +string password_hash
+        +string role
+        +jsonb settings
+        +timestamp last_active
+        +login()
+        +register()
+        +updateSettings()
+    }
+
+    class Restaurant {
+        +int id
+        +string name
+        +text description
+        +string specialty_dish
+        +string image_url
+        +geometry location
+        +int owner_id
+        +text description_* (multi-lang)
+        +text audio_* (multi-lang)
+        +create()
+        +update()
+        +delete()
+        +getNearby()
+    }
+
+    class SubscriptionPackage {
+        +int id
+        +string name
+        +numeric price
+        +text description
+        +jsonb features
+        +int duration_days
+        +int poi_limit
+        +jsonb allowed_langs
+        +create()
+        +update()
+        +delete()
+    }
+
+    class OwnerSubscription {
+        +int id
+        +int owner_id
+        +int package_id
+        +timestamp start_date
+        +timestamp end_date
+        +string status
+        +subscribe()
+    }
+
+    class ListenHistory {
+        +int id
+        +int user_id
+        +int restaurant_id
+        +string lang
+        +timestamp listened_at
+        +logListen()
+        +getHistory()
+    }
+
+    class GuestSession {
+        +string guest_id
+        +timestamp last_active
+        +updateHeartbeat()
+    }
+
+    class Partner {
+        +int id
+        +int user_id
+        +int poi_id
+        +string name
+        +text description
+        +string status
+        +string intro_media_url
+    }
+
+    class InteractionLog {
+        +int id
+        +int user_id
+        +string action
+        +string target_type
+        +int target_id
+        +timestamp timestamp
+        +logAction()
+    }
+
+    class AIService {
+        +translate(text, target_languages)
+        +textToSpeech(text)
+    }
+
+    User ||--o{ OwnerSubscription : has
+    User ||--o{ Restaurant : owns
+    User ||--o{ ListenHistory : logs
+    User ||--o{ InteractionLog : records
+    User ||--o{ Partner : associates
+    SubscriptionPackage ||--o{ OwnerSubscription : includes
+    Restaurant ||--o{ ListenHistory : logs
+    Restaurant ||--o{ Partner : associates
+    Restaurant ..> AIService : uses
+    AIService ..> Gemini : calls
+    AIService ..> ElevenLabs : calls
+```
 *   **Association:** `ListenHistory` đóng vai trò là một lớp liên kết (Association Class) kết nối thông tin giữa `User`, `Restaurant` và ngôn ngữ cụ thể.
