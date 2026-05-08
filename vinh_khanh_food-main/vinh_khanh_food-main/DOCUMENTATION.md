@@ -115,23 +115,52 @@ erDiagram
 
 ```mermaid
 flowchart TD
-    A[Người dùng mở ứng dụng] --> B{Đã login?}
-    B -- Không --> C[Hiển thị LoginScreen / Guest Map]
-    B -- Có --> D[Chuyển đến MapViewer hoặc Dashboard]
-    C --> E[Khách xem bản đồ]
-    D --> F{Role user/owner/admin}
-    F -- user --> G[Xem quán, chọn ngôn ngữ, nghe audio]
-    F -- owner --> H[Quản lý quán, gọi dịch/tts, xem package]
-    F -- admin --> I[Quản lý users/owners/packages/thống kê]
-    G --> J[Frontend gọi API /api/nearby]
-    H --> K[Frontend gọi API quản lý quán]
-    I --> L[Frontend gọi API quản trị]
-    J --> M[Backend truy vấn PostgreSQL]
-    K --> M
-    L --> M
-    M --> N[Trả dữ liệu về frontend]
-    N --> O[Hiển thị ra người dùng]
+    Start[Người dùng mở ứng dụng] --> FetchData[Frontend gọi GET /api/nearby để lấy danh sách quán]
+    FetchData --> GPS[GPS tracking bắt đầu, watchPosition]
+    GPS --> Heartbeat[POST /api/users/heartbeat mỗi 5s]
+
+    Heartbeat --> CheckAuth{Kiểm tra localStorage 'vinhkhanh_user'}
+    CheckAuth -->|Không có user| GuestMode[Hiển thị MapViewer cho Guest]
+    CheckAuth -->|Có user| CheckRole{Role của user}
+
+    CheckRole -->|user| UserMode[Hiển thị MapViewer với user features]
+    CheckRole -->|owner| OwnerMode[Hiển thị Dashboard Owner]
+    CheckRole -->|admin| AdminMode[Hiển thị Dashboard Admin]
+
+    GuestMode --> BrowseMap[Xem bản đồ, chọn quán]
+    BrowseMap --> AutoNearby[Tự động mở popup nếu GPS gần quán <30m]
+    AutoNearby --> PlayAudio[Chọn ngôn ngữ, nghe audio base64 từ restaurant.audio_<lang>]
+    PlayAudio --> GuestMode
+
+    UserMode --> BrowseMap
+    UserMode --> LoginHistory[Xem lịch sử nghe GET /api/user/history/{user_id}]
+    LoginHistory --> UserMode
+
+    OwnerMode --> ManageRestaurants[GET /api/owner/my_restaurants/{owner_id}]
+    ManageRestaurants --> CRUD[POST/PUT/DELETE /api/restaurants]
+    CRUD --> Translate[POST /api/translate với Google Gemini]
+    Translate --> TTS[POST /api/tts với ElevenLabs]
+    TTS --> OwnerMode
+
+    AdminMode --> ManageUsers[GET /api/users, POST/PUT/DELETE /api/users]
+    ManageUsers --> ManageOwners[POST /api/admin/owners, PUT /api/admin/owners/{id}]
+    ManageOwners --> ManagePackages[GET/POST/PUT/DELETE /api/admin/packages]
+    ManagePackages --> ViewStats[GET /api/stats, GET /api/admin/online-count]
+    ViewStats --> AdminMode
+
+    BrowseMap --> PlayAudio
+    PlayAudio --> LogHistory[POST /api/user/history nếu user đăng nhập]
+    LogHistory --> UserMode
 ```
+
+### Giải thích Activity Diagram
+
+- **Khởi động ứng dụng**: Frontend tự động fetch dữ liệu quán gần nhất, bắt đầu GPS tracking và heartbeat để duy trì trạng thái online.
+- **Guest mode**: Cho phép xem map, nghe audio nhưng không lưu lịch sử.
+- **User mode**: Thêm khả năng đăng nhập, lưu lịch sử nghe.
+- **Owner mode**: Quản lý quán của mình, dịch thuật đa ngôn ngữ, tạo audio TTS.
+- **Admin mode**: Quản lý toàn bộ users, owners, packages và xem thống kê hệ thống.
+- **Tương tác chính**: Map browsing, audio playback, CRUD operations, external API calls (Gemini, ElevenLabs).
 
 ## 5.3 System Architecture Flow
 
