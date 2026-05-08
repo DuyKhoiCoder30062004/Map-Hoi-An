@@ -1,0 +1,12 @@
+.
+├── src/
+│   ├── main.tsx            # Điểm khởi đầu của React (Entry point)
+│   ├── App.tsx             # Luồng chính của ứng dụng (Giao diện, AI, Audio)
+│   └── index.css           # Cấu hình Tailwind CSS và font chữ
+├── public/                 # Chứa các tài nguyên tĩnh (ảnh, icon)
+├── index.html              # Tệp HTML chính để render ứng dụng
+├── package.json            # Quản lý thư viện (React, Lucide, Motion, Gemini SDK)
+├── tsconfig.json           # Cấu hình TypeScript
+├── vite.config.ts          # Cấu hình công cụ build Vite
+├── metadata.json           # Thông tin ứng dụng (Tên, mô tả, quyền truy cập)
+└── .env.example            # Mẫu các biến môi trường (API Key)

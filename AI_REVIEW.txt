@@ -1,0 +1,89 @@
+# BÁO CÁO NGHIÊN CỨU: ỨNG DỤNG AI TRONG HỆ THỐNG HƯỚNG DẪN ẨM THỰC GIỌNG NÓI (VINH KHANH FOOD STREET VOICE SYSTEM)
+
+## 1. TỔNG HỢP CÁC KHÁI NIỆM AI LIÊN QUAN ĐẾN ĐỒ ÁN
+
+Để xây dựng tính năng hướng dẫn viên ảo, đồ án sử dụng 2 nhánh công nghệ lõi của Trí tuệ Nhân tạo:
+
+### 1.1. Khái niệm về Xử lý Ngôn ngữ Tự nhiên (NLP) & Tạo văn bản
+
+* **LLM (Large Language Model - Mô hình ngôn ngữ lớn):** Các mô hình Deep Learning dựa trên kiến trúc Transformer, chứa hàng tỷ tham số (Parameters). LLM trong đồ án đóng vai trò là "bộ não" đọc hiểu ngữ cảnh (Tên quán, khoảng cách, món ăn) và sinh ra đoạn hội thoại giới thiệu tự nhiên bằng nhiều ngôn ngữ.
+* **RAG (Retrieval-Augmented Generation):** Kỹ thuật "Thế hệ tăng cường truy xuất". Thay vì bắt AI phải "học thuộc" toàn bộ dữ liệu phố Vĩnh Khánh (rất dễ bịa đặt thông tin - Hallucination), hệ thống sẽ truy vấn Database lấy thông tin quán ăn gửi vào Prompt, AI chỉ làm nhiệm vụ sắp xếp câu chữ và dịch thuật.
+* **Prompt Engineering & Persona:** Kỹ thuật thiết kế câu lệnh đầu vào. Đồ án ép LLM đóng vai (Persona) là một hướng dẫn viên du lịch bản địa thân thiện, định hướng văn phong và độ dài đầu ra.
+
+### 1.2. Khái niệm về Xử lý Âm thanh (Speech Processing)
+
+* **Neural TTS (Text-to-Speech):** Hệ thống tổng hợp giọng nói sử dụng mạng nơ-ron nhân tạo. Thay vì ghép các âm tiết lại với nhau một cách máy móc, Neural TTS sinh ra âm thanh mượt mà, có ngữ điệu và cảm xúc.
+* **Voice Cloning (Nhân bản giọng nói):** Khái niệm tạo ra một giọng nói AI (Persona) cố định cho toàn bộ ứng dụng chỉ bằng việc "học" từ một đoạn ghi âm ngắn (3-10 giây) của người thật (Zero-shot) hoặc vài chục phút (Few-shot).
+* **Audio Streaming:** Kỹ thuật trả về luồng âm thanh theo từng đoạn (chunk) ngay khi văn bản đang được tạo ra, giúp giảm độ trễ (Latency) xuống dưới 1-2 giây cho trải nghiệm thời gian thực.
+
+---
+
+## 2. CÁC MÔ HÌNH CÓ THỂ HUẤN LUYỆN (NẾU PHẢI TRAIN / FINE-TUNE)
+
+*Lưu ý cho team KHMT: Việc "Train from scratch" (huấn luyện từ đầu) một LLM là bất khả thi với tài nguyên sinh viên. Nếu yêu cầu bắt buộc phải tự chạy mô hình, chúng ta sẽ áp dụng **Fine-Tuning (Tinh chỉnh)** trên các mô hình Pre-trained.*
+
+### 2.1. Phân hệ AI Text (LLM)
+
+* **Các mô hình phù hợp để Fine-tune:** **Qwen 1.5 - 7B** (Rất mạnh về đa ngôn ngữ) hoặc **Llama-3-8B-Instruct**.
+* **Phương pháp huấn luyện (QLoRA):** Sử dụng kỹ thuật Parameter-Efficient Fine-Tuning (PEFT), cụ thể là QLoRA (Quantized Low-Rank Adaptation). Kỹ thuật này đóng băng trọng số gốc của mô hình lớn, chỉ huấn luyện một lớp mạng nhỏ (Adapter) được chèn thêm vào.
+* **Mục đích train:** Dạy cho AI cách sử dụng từ lóng đặc thù của ẩm thực Sài Gòn (ví dụ: "phá lấu", "ốc hương", "hột vịt lộn") và định hình lại văn phong hướng dẫn viên mà các API thương mại có thể làm chưa đủ "đời thường".
+
+### 2.2. Phân hệ AI Voice (TTS)
+
+* **Các mô hình phù hợp:** **Coqui XTTS v2** hoặc **VITS**.
+* **Phương pháp huấn luyện:** Few-shot Fine-tuning.
+* **Mục đích train:** Tạo ra một "giọng đọc độc quyền" cho hệ thống Vĩnh Khánh. XTTS hỗ trợ huấn luyện đa ngôn ngữ, nghĩa là chỉ cần đưa giọng một người Việt vào train, mô hình có thể dùng chất giọng đó nói tiếng Hàn, Nhật, Anh.
+
+---
+
+## 3. CÁC THƯ VIỆN PYTHON ÁP DỤNG TRONG ĐỒ ÁN
+
+Team KHMT sẽ sử dụng hệ sinh thái Python để xây dựng Backend và xử lý AI. Các thư viện được chia làm 2 nhóm:
+
+### Nhóm 1: Triển khai theo hướng dùng Cloud API (Định hướng chính của đồ án)
+
+* `google-generativeai`: Thư viện SDK chính thức để gọi Gemini API (dùng cho Text Generation đa ngôn ngữ).
+* `elevenlabs` hoặc `google-cloud-texttospeech`: Dùng để gọi API chuyển đổi văn bản thành giọng nói chất lượng cao.
+* `FastAPI`: Dựng Backend Server siêu tốc để nhận GPS, xử lý logic, gọi AI API và trả luồng âm thanh (Streaming) về cho Web App.
+* `psycopg2` / `GeoAlchemy2`: Kết nối với PostgreSQL + PostGIS để xử lý truy vấn không gian (khoảng cách < 500m).
+
+### Nhóm 2: Dùng để Train / Fine-tune (Nếu triển khai Local Model)
+
+* `torch` (PyTorch): Khung xương (Framework) Deep Learning lõi.
+* `transformers` (Hugging Face): Tải, chạy và cấu hình các mô hình LLM.
+* `peft` & `trl`: Dùng để thiết lập cấu hình LoRA/QLoRA và chạy tập lệnh huấn luyện (Supervised Fine-Tuning).
+* `bitsandbytes`: Thư viện cực kỳ quan trọng để lượng tử hóa (Quantization) ép mô hình từ 16-bit xuống 4-bit/8-bit nhằm chạy vừa trên GPU yếu.
+* `TTS` (Coqui): Thư viện mã nguồn mở để chạy và Fine-tune mô hình XTTS.
+
+---
+
+## 4. CÁC ĐIỀU KIỆN CẦN ĐỂ HUẤN LUYỆN MÔ HÌNH (HARDWARE & DATA)
+
+Nếu đồ án yêu cầu phải minh chứng việc tự huấn luyện (Fine-tune), team KHMT cần chuẩn bị các điều kiện khắt khe sau:
+
+### 4.1. Điều kiện về Dữ liệu (Dataset)
+
+* **Dữ liệu Text (LLM):** Cần thu thập và gán nhãn khoảng 500 - 1000 mẫu hội thoại dưới dạng file `.jsonl`.
+* *Cấu trúc:* `{"instruction": "Đóng vai HDV, giới thiệu Ốc Oanh bằng tiếng Hàn", "input": "Khoảng cách 200m", "output": "[Câu trả lời bằng tiếng Hàn mẫu]"}`.
+
+
+* **Dữ liệu Audio (TTS):** Cần một bộ thu âm sạch (không tiếng ồn) dài khoảng 20 - 30 phút (định dạng `.wav`, 22050Hz), cắt nhỏ thành từng câu 3-10 giây, kèm theo file `metadata.csv` chứa đoạn text tương ứng của mỗi file audio.
+
+### 4.2. Điều kiện về Phần cứng (Hardware/GPU)
+
+Việc train mô hình Deep Learning không thể chạy trên CPU thông thường.
+
+* **Để Fine-tune LLM (QLoRA 4-bit):** Yêu cầu GPU có tối thiểu **16GB VRAM** (Ví dụ: NVIDIA RTX 4080, Tesla T4).
+* **Giải pháp khả thi cho sinh viên:** Thuê máy chủ đám mây tính tiền theo giờ (như RunPod, Vast.ai với giá ~0.2$/giờ cho RTX 3090) hoặc sử dụng **Google Colab Pro**.
+
+---
+
+## 5. KẾT LUẬN & ĐỊNH HƯỚNG TRIỂN KHAI THỰC TẾ
+
+Dựa trên các phân tích trên, mặc dù việc tự Fine-tune mô hình (LLM & TTS) mang lại khả năng tùy biến cao, nhưng nó đòi hỏi **chi phí phần cứng (GPU) cực lớn, thời gian huấn luyện dài và khó đảm bảo độ trễ thấp (latency) trong môi trường thực tế.**
+
+Do đó, đồ án quyết định **chọn hướng đi sử dụng Cloud API (Gemini cho LLM và ElevenLabs/Google TTS cho Voice)** tích hợp vào kiến trúc Backend (FastAPI). Hướng đi này cho phép:
+
+1. Bỏ qua khâu chuẩn bị phần cứng khắt khe.
+2. Đạt được chất lượng đầu ra (văn bản & giọng nói) chuẩn thương mại (State-of-the-Art).
+3. Áp dụng mô hình **Freemium (Cấp Quota)** cho người dùng để kiểm soát chi phí API ở mức tối thiểu cho sinh viên phát triển.
