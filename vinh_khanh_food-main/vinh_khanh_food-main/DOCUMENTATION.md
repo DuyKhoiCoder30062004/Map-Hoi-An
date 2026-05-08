@@ -2,6 +2,8 @@
 
 ## 5.1 ERD
 
+Xem chi tiết sơ đồ ERD tại [diagrams/ERD.md](diagrams/ERD.md).
+
 ```mermaid
 erDiagram
     users {
@@ -93,18 +95,18 @@ erDiagram
         int user_id FK
         string action
         string target_type
-n        int target_id
+        int target_id
         timestamp timestamp
     }
 
-    users ||--o{ owner_subscriptions : has
-    subscription_packages ||--o{ owner_subscriptions : includes
-    users ||--o{ restaurants : owns
-    users ||--o{ listen_history : logs
-    restaurants ||--o{ listen_history : logs
-    users ||--o{ interaction_logs : records
-    users ||--o{ partners : associates
-    restaurants ||--o{ partners : associates
+    users ||--o{ owner_subscriptions : "has"
+    subscription_packages ||--o{ owner_subscriptions : "includes"
+    users ||--o{ restaurants : "owns"
+    users ||--o{ listen_history : "logs"
+    restaurants ||--o{ listen_history : "logs"
+    users ||--o{ interaction_logs : "records"
+    users ||--o{ partners : "associates"
+    restaurants ||--o{ partners : "associates"
 ```
 
 > Lưu ý: bảng `partners` và `interaction_logs` được thêm vào bằng `init_pois.sql`.
@@ -184,41 +186,41 @@ flowchart TB
 
 ### Use Case Diagram
 
+Xem thêm sơ đồ chi tiết tại [diagrams/USE-CASE.md](diagrams/USE-CASE.md).
+
 ```mermaid
-graph TD
-    subgraph Actors
-        A[Admin]
-        U[User]
-        O[Owner]
-        G[Guest]
+graph LR
+    Admin((Admin))
+    Owner((Owner))
+    User((Registered User))
+    Guest((Guest))
+
+    subgraph "Use Cases"
+        Login["Đăng nhập / Đăng ký"]
+        Browse["Xem bản đồ và nhà hàng"]
+        Audio["Nghe thuyết minh audio"]
+        History["Lưu lịch sử nghe"]
+        ManagePOI["Quản lý quán ăn"]
+        Subscribe["Đăng ký gói package"]
+        Translate["Dịch thuật / TTS"]
+        ManageUsers["Quản lý users/owners"]
+        ManagePackage["Tạo / Cập nhật package"]
+        Stats["Xem thống kê"]
     end
 
-    subgraph Use Cases
-        UC1[Đăng nhập/Đăng ký]
-        UC2[Xem bản đồ quán ăn]
-        UC3[Nghe thuyết minh audio]
-        UC4[Lưu lịch sử nghe]
-        UC5[Quản lý quán ăn]
-        UC6[Đăng ký gói package]
-        UC7[Dịch thuật/TTS]
-        UC8[Quản lý users/owners]
-        UC9[Tạo/Cập nhật package]
-        UC10[Xem thống kê]
-    end
-
-    G --> UC2
-    G --> UC3
-    U --> UC1
-    U --> UC2
-    U --> UC3
-    U --> UC4
-    O --> UC1
-    O --> UC5
-    O --> UC6
-    O --> UC7
-    A --> UC8
-    A --> UC9
-    A --> UC10
+    Guest --> Browse
+    Guest --> Audio
+    User --> Login
+    User --> Browse
+    User --> Audio
+    User --> History
+    Owner --> Login
+    Owner --> ManagePOI
+    Owner --> Subscribe
+    Owner --> Translate
+    Admin --> ManageUsers
+    Admin --> ManagePackage
+    Admin --> Stats
 ```
 
 ## 5.5 Sequence Diagram
